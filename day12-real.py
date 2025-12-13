@@ -24,7 +24,7 @@ for j, l in enumerate(stdin):
 	C, R = map(int, A[:-1].split('x'))
 	G = [[0] * C for _ in range(R)]
 	I = [0] * 6
-	prob = LpProblem("Problem", LpMaximize)
+	prob = LpProblem("Problem", LpMinimize)
 	for i, (p, idx) in enumerate(S):
 		for r in range(R - 2):
 			for c in range(C - 2):
@@ -36,10 +36,9 @@ for j, l in enumerate(stdin):
 		for c in range(C):
 			prob += G[r][c] <= 1
 	for i in range(6):
-		prob += I[i] <= Q[i]
+		prob += I[i] >= Q[i]
 	prob += sum(I)
-	prob.solve(PULP_CBC_CMD(msg=0))
-	v, s = round(prob.objective.value()), sum(Q)
-	print(f"{j} -> {v}/{s}")
-	res += v == s
+	status = prob.solve()
+	print(f"{j} -> {status}")
+	res += status > 0
 print(res)
